@@ -1,5 +1,4 @@
 mod entities;
-use entities::{Game, Player, TickType, Coordinates};
 
 fn main() {
     println!("Bonjour ! Tu t'apprêtes à pénétrer l'une des plus grandes aventures jamais conçues à ce jour. Le morpion. C'est parti.");
@@ -7,7 +6,10 @@ fn main() {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::entities::ticktype::TickType;
+    use crate::entities::player::Player;
+    use crate::entities::game::Game;
+    use crate::entities::coordinates::Coordinates;
 
     #[test]
     fn should_display_the_board_correctly_after_few_plays() {
