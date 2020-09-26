@@ -1,4 +1,6 @@
 use crate::entities::ticktype::TickType;
+use crate::entities::coordinates::Coordinates;
+use crate::entities::grid::Grid;
 
 pub struct Player {
     name: String,
@@ -11,17 +13,8 @@ impl Player {
             name: String::from(name), tick_type
         }
     }
-}
 
-pub struct Players {
-    player1: Player,
-    player2: Player
-}
-
-impl Players {
-    pub fn from_couple(player1: Player, player2: Player) -> Players {
-        return Players {
-            player1, player2
-        }
+    pub fn play(&self, coordinates: &Coordinates, grid: &mut Grid) {
+        grid.tick(&coordinates, &self.tick_type)
     }
 }

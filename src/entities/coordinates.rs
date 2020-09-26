@@ -1,6 +1,6 @@
 pub struct Coordinates {
-    x: u32,
-    y: u32
+    pub x: u32,
+    pub y: u32
 }
 
 impl Coordinates {

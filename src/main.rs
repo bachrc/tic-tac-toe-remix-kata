@@ -8,8 +8,8 @@ fn main() {
 mod tests {
     use crate::entities::ticktype::TickType;
     use crate::entities::player::Player;
-    use crate::entities::game::Game;
     use crate::entities::coordinates::Coordinates;
+    use crate::entities::grid::Grid;
 
     #[test]
     fn should_display_the_board_correctly_after_few_plays() {
@@ -18,11 +18,12 @@ mod tests {
         let player1 = Player::new("Dimitri", TickType::NOUGHT);
         let player2 = Player::new("Alphonse", TickType::CROSS);
 
-        let mut game = Game::new(4, player1, player2);
-        game.first_player_play(&Coordinates::from(0, 0));
-        game.second_player_play(&Coordinates::from(1, 0));
+        let mut grid = Grid::new(4);
 
-        let board_representation: String = game.compute_board_representation();
+        player1.play(&Coordinates::from(0, 0), &mut grid);
+        player2.play(&Coordinates::from(1, 0), &mut grid);
+
+        let board_representation: String = grid.compute_representation();
 
         assert_eq!(board_representation, expected_representation)
     }
