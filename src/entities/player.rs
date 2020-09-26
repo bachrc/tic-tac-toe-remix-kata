@@ -2,6 +2,7 @@ use crate::entities::ticktype::TickType;
 use crate::entities::coordinates::Coordinates;
 use crate::entities::grid::Grid;
 
+#[derive(Debug, PartialEq)]
 pub struct Player {
     name: String,
     tick_type: TickType

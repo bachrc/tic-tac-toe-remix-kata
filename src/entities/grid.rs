@@ -1,13 +1,15 @@
 use crate::entities::ticktype::TickType;
 use crate::entities::coordinates::Coordinates;
+use crate::entities::gamestate::GameState;
 
+#[derive(Debug)]
 pub struct Grid {
     lines: Vec<Line>
 }
 
 impl Grid {
-    pub fn new(size: u32) -> Grid {
-        let lines : Vec<Line> = (0..size)
+    pub fn new(size: usize) -> Grid {
+        let lines: Vec<Line> = (0..size)
             .map(|_| Line::new(size))
             .collect();
 
@@ -15,7 +17,7 @@ impl Grid {
     }
 
     pub fn compute_representation(&self) -> String {
-        let lines_representation : Vec<String> = self.lines.iter()    
+        let lines_representation: Vec<String> = self.lines.iter()
             .map(|line| line.compute_representation())
             .collect();
 
@@ -27,14 +29,19 @@ impl Grid {
             .expect("Invalid coordinate !")
             .tick(coordinates, tick_type);
     }
+
+    pub fn game_state(&self) -> GameState {
+        GameState::InProgress
+    }
 }
 
+#[derive(Debug)]
 pub struct Line {
     cells: Vec<Cell>
 }
 
 impl Line {
-    pub fn new(size: u32) -> Line {
+    pub fn new(size: usize) -> Line {
         let cells : Vec<Cell> = (0..size)
             .map(|_| Cell::new())
             .collect();
@@ -58,6 +65,7 @@ impl Line {
     }
 }
 
+#[derive(Debug)]
 pub struct Cell {
     state: Option<TickType>
 }

@@ -1,14 +1,14 @@
-#[derive(Clone)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum TickType {
-    NOUGHT,
-    CROSS
+    Nought,
+    Cross
 }
 
 impl TickType {
     pub fn compute_representation(&self) -> String {
         match &self {
-            TickType::NOUGHT => String::from("O"),
-            TickType::CROSS => String::from("X")
+            TickType::Nought => String::from("O"),
+            TickType::Cross => String::from("X")
         }
     }
 }
