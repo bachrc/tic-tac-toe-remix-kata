@@ -1,6 +1,8 @@
 use crate::entities::ticktype::TickType;
 use crate::entities::coordinates::Coordinates;
 use crate::entities::grid::Grid;
+use std::error::Error;
+use crate::errors::TicTacToeError;
 
 #[derive(Debug, PartialEq)]
 pub struct Player {
@@ -15,7 +17,7 @@ impl Player {
         }
     }
 
-    pub fn play(&self, coordinates: &Coordinates, grid: &mut Grid) {
+    pub fn play(&self, coordinates: &Coordinates, grid: &mut Grid) -> Result<(), TicTacToeError> {
         grid.tick(&coordinates, &self.tick_type)
     }
 }

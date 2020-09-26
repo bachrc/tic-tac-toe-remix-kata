@@ -1,4 +1,5 @@
 mod entities;
+mod errors;
 
 fn main() {
     println!("Bonjour ! Tu t'apprêtes à pénétrer l'une des plus grandes aventures jamais conçues à ce jour. Le morpion. C'est parti.");
@@ -34,5 +35,26 @@ mod tests {
         let mut grid = Grid::new(3);
 
         assert_eq!(grid.game_state(), GameState::InProgress)
+    }
+
+    #[test]
+    fn a_filled_grid_without_any_winners_should_indicate_the_finished_game_state() {
+        let mut game = Grid::new(3);
+
+        let player1 = Player::new("Dimitri", TickType::Nought);
+        let player2 = Player::new("Alphonse", TickType::Cross);
+
+        player1.play(&Coordinates::from(0, 0), &mut game);
+        player1.play(&Coordinates::from(0, 2), &mut game);
+        player1.play(&Coordinates::from(1, 1), &mut game);
+        player1.play(&Coordinates::from(2, 1), &mut game);
+
+        player1.play(&Coordinates::from(0, 1), &mut game);
+        player2.play(&Coordinates::from(1, 0), &mut game);
+        player2.play(&Coordinates::from(1, 2), &mut game);
+        player2.play(&Coordinates::from(2, 0), &mut game);
+        player2.play(&Coordinates::from(2, 2), &mut game);
+
+        assert_eq!(game.game_state(), GameState::Finished)
     }
 }

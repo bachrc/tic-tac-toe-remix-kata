@@ -1,6 +1,8 @@
 use crate::entities::ticktype::TickType;
 use crate::entities::coordinates::Coordinates;
 use crate::entities::gamestate::GameState;
+use std::error::Error;
+use crate::errors::TicTacToeError;
 
 #[derive(Debug)]
 pub struct Grid {
@@ -24,10 +26,14 @@ impl Grid {
         lines_representation.join("\n")
     }
 
-    pub fn tick(&mut self, coordinates: &Coordinates, tick_type: &TickType) {
-        self.lines.get_mut(coordinates.y as usize)
-            .expect("Invalid coordinate !")
-            .tick(coordinates, tick_type);
+    pub fn tick(&mut self, coordinates: &Coordinates, tick_type: &TickType) -> Result<(), TicTacToeError> {
+        self.fetch_line_at(coordinates.y as usize)
+            .ok_or(TicTacToeError::CoordinateOutOfScope)?
+            .tick(coordinates, tick_type)
+    }
+
+    fn fetch_line_at(&mut self, index: usize) -> Option<&mut Line> {
+        self.lines.get_mut(index)
     }
 
     pub fn game_state(&self) -> GameState {
@@ -57,11 +63,27 @@ impl Line {
         cells_representations.join("")
     }
 
-    fn tick(&mut self, coordinates: &Coordinates, tick_type: &TickType) {
+    fn tick(&mut self, coordinates: &Coordinates, tick_type: &TickType) -> Result<(), TicTacToeError> {
         let index = coordinates.x as usize;
+
+        if !self.is_cell_empty(index)? {
+            return Err(TicTacToeError::CellNotEmpty)
+        }
 
         self.cells.remove(index);
         self.cells.insert(index, Cell::from(tick_type));
+
+        Ok(())
+    }
+
+    fn is_cell_empty(&self, index: usize) -> Result<bool, TicTacToeError> {
+        Ok(self.retrieve_cell_at(index)?
+            .is_empty()
+        )
+    }
+
+    fn retrieve_cell_at(&self, index: usize) -> Result<&Cell, TicTacToeError> {
+        self.cells.get(index).ok_or(TicTacToeError::CoordinateOutOfScope)
     }
 }
 
@@ -83,6 +105,10 @@ impl Cell {
         }
     }
 
+    pub fn is_empty(&self) -> bool {
+        self.state.is_some()
+    }
+
     pub fn compute_representation(&self) -> String {
         match &self.state {
             Some(state) => state.compute_representation(),
@@ -94,6 +120,10 @@ impl Cell {
 #[cfg(test)]
 mod tests {
     use crate::entities::grid::Grid;
+    use crate::entities::player::Player;
+    use crate::entities::ticktype::TickType;
+    use crate::entities::coordinates::Coordinates;
+    use crate::errors::TicTacToeError;
 
     #[test]
     fn new_game_should_be_represented_as_an_empty_grid() {
@@ -103,5 +133,20 @@ mod tests {
         let game = Grid::new(morpion_size);
 
         assert_eq!(game.compute_representation(), expected_representation)
+    }
+
+    #[test]
+    fn should_not_play_somewhere_already_played() {
+        let morpion_size = 3;
+        let mut game = Grid::new(morpion_size);
+
+        let player1 = Player::new("Dimitri", TickType::Nought);
+        let player2 = Player::new("Alphonse", TickType::Cross);
+
+        player1.play(&Coordinates::from(0, 0), &mut game);
+        let result = player2.play(&Coordinates::from(0, 0), &mut game);
+
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err(), TicTacToeError::CellNotEmpty)
     }
 }
