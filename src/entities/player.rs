@@ -1,7 +1,6 @@
 use crate::entities::ticktype::TickType;
 use crate::entities::coordinates::Coordinates;
 use crate::entities::grid::Grid;
-use std::error::Error;
 use crate::errors::TicTacToeError;
 
 #[derive(Debug, PartialEq)]

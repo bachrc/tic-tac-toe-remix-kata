@@ -22,8 +22,8 @@ mod tests {
 
         let mut grid = Grid::new(4);
 
-        player1.play(&Coordinates::from(0, 0), &mut grid);
-        player2.play(&Coordinates::from(1, 0), &mut grid);
+        player1.play(&Coordinates::from(0, 0), &mut grid).unwrap();
+        player2.play(&Coordinates::from(1, 0), &mut grid).unwrap();
 
         let board_representation: String = grid.compute_representation();
 
@@ -32,7 +32,7 @@ mod tests {
 
     #[test]
     fn an_empty_grid_should_not_be_considered_as_finished() {
-        let mut grid = Grid::new(3);
+        let grid = Grid::new(3);
 
         assert_eq!(grid.game_state(), GameState::InProgress)
     }
@@ -44,16 +44,16 @@ mod tests {
         let player1 = Player::new("Dimitri", TickType::Nought);
         let player2 = Player::new("Alphonse", TickType::Cross);
 
-        player1.play(&Coordinates::from(0, 0), &mut game);
-        player1.play(&Coordinates::from(0, 2), &mut game);
-        player1.play(&Coordinates::from(1, 1), &mut game);
-        player1.play(&Coordinates::from(2, 1), &mut game);
+        player1.play(&Coordinates::from(0, 0), &mut game).unwrap();
+        player1.play(&Coordinates::from(0, 2), &mut game).unwrap();
+        player1.play(&Coordinates::from(1, 1), &mut game).unwrap();
+        player1.play(&Coordinates::from(2, 1), &mut game).unwrap();
 
-        player1.play(&Coordinates::from(0, 1), &mut game);
-        player2.play(&Coordinates::from(1, 0), &mut game);
-        player2.play(&Coordinates::from(1, 2), &mut game);
-        player2.play(&Coordinates::from(2, 0), &mut game);
-        player2.play(&Coordinates::from(2, 2), &mut game);
+        player1.play(&Coordinates::from(0, 1), &mut game).unwrap();
+        player2.play(&Coordinates::from(1, 0), &mut game).unwrap();
+        player2.play(&Coordinates::from(1, 2), &mut game).unwrap();
+        player2.play(&Coordinates::from(2, 0), &mut game).unwrap();
+        player2.play(&Coordinates::from(2, 2), &mut game).unwrap();
 
         assert_eq!(game.game_state(), GameState::Finished)
     }

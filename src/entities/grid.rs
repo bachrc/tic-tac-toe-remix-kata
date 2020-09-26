@@ -1,7 +1,6 @@
 use crate::entities::ticktype::TickType;
 use crate::entities::coordinates::Coordinates;
 use crate::entities::gamestate::GameState;
-use std::error::Error;
 use crate::errors::TicTacToeError;
 
 #[derive(Debug)]
@@ -26,18 +25,26 @@ impl Grid {
         lines_representation.join("\n")
     }
 
+    pub fn game_state(&self) -> GameState {
+        if self.is_grid_full() {
+            return GameState::Finished
+        }
+        GameState::InProgress
+
+    }
+
     pub fn tick(&mut self, coordinates: &Coordinates, tick_type: &TickType) -> Result<(), TicTacToeError> {
         self.fetch_line_at(coordinates.y as usize)
             .ok_or(TicTacToeError::CoordinateOutOfScope)?
             .tick(coordinates, tick_type)
     }
 
-    fn fetch_line_at(&mut self, index: usize) -> Option<&mut Line> {
-        self.lines.get_mut(index)
+    fn is_grid_full(&self) -> bool {
+        self.lines.iter().all(Line::is_full)
     }
 
-    pub fn game_state(&self) -> GameState {
-        GameState::InProgress
+    fn fetch_line_at(&mut self, index: usize) -> Option<&mut Line> {
+        self.lines.get_mut(index)
     }
 }
 
@@ -85,6 +92,10 @@ impl Line {
     fn retrieve_cell_at(&self, index: usize) -> Result<&Cell, TicTacToeError> {
         self.cells.get(index).ok_or(TicTacToeError::CoordinateOutOfScope)
     }
+
+    fn is_full(&self) -> bool {
+        self.cells.iter().all(Cell::is_full)
+    }
 }
 
 #[derive(Debug)]
@@ -106,6 +117,10 @@ impl Cell {
     }
 
     pub fn is_empty(&self) -> bool {
+        self.state.is_none()
+    }
+
+    pub fn is_full(&self) -> bool {
         self.state.is_some()
     }
 
@@ -143,7 +158,7 @@ mod tests {
         let player1 = Player::new("Dimitri", TickType::Nought);
         let player2 = Player::new("Alphonse", TickType::Cross);
 
-        player1.play(&Coordinates::from(0, 0), &mut game);
+        let _ = player1.play(&Coordinates::from(0, 0), &mut game);
         let result = player2.play(&Coordinates::from(0, 0), &mut game);
 
         assert!(result.is_err());
