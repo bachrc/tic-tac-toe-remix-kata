@@ -2,7 +2,6 @@ use crate::entities::ticktype::TickType;
 use crate::entities::coordinates::Coordinates;
 
 pub struct Grid {
-    size: u32,
     lines: Vec<Line>
 }
 
@@ -12,7 +11,7 @@ impl Grid {
             .map(|_| Line::new(size))
             .collect();
 
-        Grid { size, lines }
+        Grid { lines }
     }
 
     pub fn compute_representation(&self) -> String {
@@ -24,11 +23,12 @@ impl Grid {
     }
 
     pub fn tick(&mut self, coordinates: &Coordinates, tick_type: &TickType) {
-        self.lines.get(coordinates.y as usize)
+        self.lines.get_mut(coordinates.y as usize)
             .expect("Invalid coordinate !")
             .tick(coordinates, tick_type);
     }
 }
+
 pub struct Line {
     cells: Vec<Cell>
 }
@@ -50,8 +50,11 @@ impl Line {
         cells_representations.join("")
     }
 
-    fn tick(&self, coordinates: &Coordinates, tick_type: &TickType) {
-        
+    fn tick(&mut self, coordinates: &Coordinates, tick_type: &TickType) {
+        let index = coordinates.x as usize;
+
+        self.cells.remove(index);
+        self.cells.insert(index, Cell::from(tick_type));
     }
 }
 
@@ -63,6 +66,12 @@ impl Cell {
     pub fn new() -> Cell{
         Cell{
             state: Option::None
+        }
+    }
+
+    pub fn from(tick_type: &TickType) -> Cell {
+        Cell {
+            state: Option::Some(tick_type.clone())
         }
     }
 
