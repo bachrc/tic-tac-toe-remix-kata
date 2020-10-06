@@ -22,7 +22,7 @@ impl Grid {
 
     pub fn compute_representation(&self) -> String {
         let lines_representation: Vec<String> = self.lines.iter()
-            .map(|line| line.compute_representation())
+            .map(Line::compute_representation)
             .collect();
 
         lines_representation.join("\n")
@@ -33,15 +33,11 @@ impl Grid {
             return GameState::Finished
         }
 
-        if self.check_vertical_win() {
+        if self.is_there_an_horizontal_winner() {
             return GameState::Won
         }
 
         GameState::InProgress
-    }
-
-    fn check_vertical_win(&self) -> bool {
-        self.lines.iter().any(Line::is_won)
     }
 
     pub fn tick(&mut self, coordinates: &Coordinates, tick_type: &TickType) -> Result<(), TicTacToeError> {
@@ -50,7 +46,7 @@ impl Grid {
             .tick(coordinates, tick_type)
     }
 
-    fn fetch_horizontal_winner(&self) -> bool {
+    fn is_there_an_horizontal_winner(&self) -> bool {
         self.lines.iter().any(Line::is_won)
     }
 
