@@ -1,8 +1,8 @@
-use crate::entities::grid::Cell;
 use itertools::Itertools;
 use crate::entities::coordinates::Coordinates;
 use crate::entities::ticktype::TickType;
 use crate::errors::TicTacToeError;
+use crate::entities::cell::Cell;
 
 #[derive(Debug)]
 pub struct Line {
