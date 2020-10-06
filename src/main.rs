@@ -57,4 +57,23 @@ mod tests {
 
         assert_eq!(game.game_state(), GameState::Finished)
     }
+    
+    #[test]
+    fn should_detect_when_someone_wins_with_a_full_row() {
+        let mut game = Grid::new(3);
+
+        let player1 = Player::new("Dimitri", TickType::Nought);
+        let player2 = Player::new("Alphonse", TickType::Cross);
+
+        player1.play(&Coordinates::from(0, 1), &mut game).unwrap();
+        player2.play(&Coordinates::from(0, 0), &mut game).unwrap();
+        player1.play(&Coordinates::from(1, 1), &mut game).unwrap();
+        player2.play(&Coordinates::from(1, 0), &mut game).unwrap();
+        player1.play(&Coordinates::from(2, 1), &mut game).unwrap();
+
+        let state = game.game_state();
+
+        assert_eq!(state, GameState::Won);
+
+    }
 }

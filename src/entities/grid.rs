@@ -1,7 +1,10 @@
+extern crate itertools;
+use itertools::Itertools;
 use crate::entities::ticktype::TickType;
 use crate::entities::coordinates::Coordinates;
 use crate::entities::gamestate::GameState;
 use crate::errors::TicTacToeError;
+use crate::entities::line::Line;
 
 #[derive(Debug)]
 pub struct Grid {
@@ -29,14 +32,26 @@ impl Grid {
         if self.is_grid_full() {
             return GameState::Finished
         }
-        GameState::InProgress
 
+        if self.check_vertical_win() {
+            return GameState::Won
+        }
+
+        GameState::InProgress
+    }
+
+    fn check_vertical_win(&self) -> bool {
+        self.lines.iter().any(Line::is_won)
     }
 
     pub fn tick(&mut self, coordinates: &Coordinates, tick_type: &TickType) -> Result<(), TicTacToeError> {
         self.fetch_line_at(coordinates.y as usize)
             .ok_or(TicTacToeError::CoordinateOutOfScope)?
             .tick(coordinates, tick_type)
+    }
+
+    fn fetch_horizontal_winner(&self) -> bool {
+        self.lines.iter().any(Line::is_won)
     }
 
     fn is_grid_full(&self) -> bool {
@@ -48,59 +63,11 @@ impl Grid {
     }
 }
 
-#[derive(Debug)]
-pub struct Line {
-    cells: Vec<Cell>
-}
 
-impl Line {
-    pub fn new(size: usize) -> Line {
-        let cells : Vec<Cell> = (0..size)
-            .map(|_| Cell::new())
-            .collect();
-
-        Line{cells}
-    }
-
-    pub fn compute_representation(&self) -> String {
-        let cells_representations : Vec<String> = self.cells.iter()
-            .map(|cell| cell.compute_representation())
-            .collect();
-
-        cells_representations.join("")
-    }
-
-    fn tick(&mut self, coordinates: &Coordinates, tick_type: &TickType) -> Result<(), TicTacToeError> {
-        let index = coordinates.x as usize;
-
-        if !self.is_cell_empty(index)? {
-            return Err(TicTacToeError::CellNotEmpty)
-        }
-
-        self.cells.remove(index);
-        self.cells.insert(index, Cell::from(tick_type));
-
-        Ok(())
-    }
-
-    fn is_cell_empty(&self, index: usize) -> Result<bool, TicTacToeError> {
-        Ok(self.retrieve_cell_at(index)?
-            .is_empty()
-        )
-    }
-
-    fn retrieve_cell_at(&self, index: usize) -> Result<&Cell, TicTacToeError> {
-        self.cells.get(index).ok_or(TicTacToeError::CoordinateOutOfScope)
-    }
-
-    fn is_full(&self) -> bool {
-        self.cells.iter().all(Cell::is_full)
-    }
-}
 
 #[derive(Debug)]
 pub struct Cell {
-    state: Option<TickType>
+    pub state: Option<TickType>
 }
 
 impl Cell {

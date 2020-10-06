@@ -4,5 +4,5 @@ use crate::entities::ticktype::TickType;
 pub enum GameState {
     InProgress,
     Finished,
-    WonBy(TickType)
+    Won
 }
