@@ -1,6 +1,6 @@
 use crate::entities::ticktype::TickType;
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
 pub struct Cell {
     pub state: Option<TickType>
 }

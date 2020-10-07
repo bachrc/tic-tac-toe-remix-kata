@@ -5,3 +5,4 @@ pub mod ticktype;
 pub mod gamestate;
 pub mod line;
 pub mod cell;
+pub mod tictactoechecker;

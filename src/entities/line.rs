@@ -18,6 +18,12 @@ impl Line {
         Line{cells}
     }
 
+    pub fn from(cells: Vec<&Cell>) -> Line {
+        let vec = cells.into_iter().copied().collect();
+
+        Line {cells: vec }
+    }
+
     pub fn compute_representation(&self) -> String {
         let cells_representations : Vec<String> = self.cells.iter()
             .map(|cell| cell.compute_representation())
@@ -26,40 +32,35 @@ impl Line {
         cells_representations.join("")
     }
 
-    pub fn is_won(&self) -> bool {
-        if !self.is_full() {
-            return false;
-        }
-
-        let cells_tick = self.cells.iter()
-            .filter_map(|cell| cell.state)
-            .unique()
-            .count();
-
-        return cells_tick == 1
-    }
-
-    pub(crate) fn tick(&mut self, coordinates: &Coordinates, tick_type: &TickType) -> Result<(), TicTacToeError> {
-        let index = coordinates.x as usize;
-
-        if !self.is_cell_empty(index)? {
+    pub fn tick(&mut self, coordinates: &Coordinates, tick_type: &TickType) -> Result<(), TicTacToeError> {
+        if !self.is_cell_empty(coordinates.x)? {
             return Err(TicTacToeError::CellNotEmpty)
         }
 
-        self.cells.remove(index);
-        self.cells.insert(index, Cell::from(tick_type));
+        self.cells.remove(coordinates.x);
+        self.cells.insert(coordinates.x, Cell::from(tick_type));
 
         Ok(())
     }
 
     fn is_cell_empty(&self, index: usize) -> Result<bool, TicTacToeError> {
-        Ok(self.retrieve_cell_at(index)?
-            .is_empty()
-        )
+        Ok(self.retrieve_cell_at(index)?.is_empty())
     }
 
-    fn retrieve_cell_at(&self, index: usize) -> Result<&Cell, TicTacToeError> {
+    pub fn retrieve_cell_at(&self, index: usize) -> Result<&Cell, TicTacToeError> {
         self.cells.get(index).ok_or(TicTacToeError::CoordinateOutOfScope)
+    }
+
+    pub fn is_won(&self) -> bool {
+        if !self.is_full() {
+            return false;
+        }
+
+        let unique_cells = self.cells.iter()
+            .unique()
+            .count();
+
+        return unique_cells == 1
     }
 
     pub fn is_full(&self) -> bool {

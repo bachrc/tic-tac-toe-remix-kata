@@ -1,13 +1,15 @@
 extern crate itertools;
-use itertools::Itertools;
 use crate::entities::ticktype::TickType;
 use crate::entities::coordinates::Coordinates;
 use crate::entities::gamestate::GameState;
 use crate::errors::TicTacToeError;
 use crate::entities::line::Line;
+use crate::entities::cell::Cell;
+use crate::entities::tictactoechecker::MonItertools;
 
 #[derive(Debug)]
 pub struct Grid {
+    size: usize,
     lines: Vec<Line>
 }
 
@@ -17,7 +19,7 @@ impl Grid {
             .map(|_| Line::new(size))
             .collect();
 
-        Grid { lines }
+        Grid { lines, size }
     }
 
     pub fn compute_representation(&self) -> String {
@@ -33,7 +35,7 @@ impl Grid {
             return GameState::Finished
         }
 
-        if self.is_there_an_horizontal_winner() {
+        if self.is_there_an_horizontal_winner() || self.is_there_a_vertical_winner() {
             return GameState::Won
         }
 
@@ -48,6 +50,24 @@ impl Grid {
 
     fn is_there_an_horizontal_winner(&self) -> bool {
         self.lines.iter().any(Line::is_won)
+    }
+
+    fn is_there_a_vertical_winner(&self) -> bool {
+        (0..self.size)
+            .map(|index| self.fetch_vertical_line_at(index))
+            .map(|res| res.unwrap())
+            .any(|line| line.is_won())
+    }
+
+    fn fetch_vertical_line_at(&self, x: usize) -> Result<Line, TicTacToeError> {
+        let (cells, errors) : (Vec<&Cell>, Vec<TicTacToeError>) = self.lines.iter()
+            .partition_map_results(|line| line.retrieve_cell_at(x));
+
+        if !errors.is_empty() {
+            return Err(TicTacToeError::CoordinateOutOfScope)
+        }
+
+        Ok(Line::from(cells))
     }
 
     fn is_grid_full(&self) -> bool {
